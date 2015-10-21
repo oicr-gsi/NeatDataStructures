@@ -7,10 +7,10 @@ This is the repository for code which uses human genomic data
 ## Instructions to grab human genomic data from ICGC
 Access the ICGC Data Portal at https://dcc.icgc.org/. Select "Cancer Projects" and choose the cancer of interest (in this case, Breast Cancer). Data are organized by
 several categories that can be selected:
-*Country
-*Available Data Types
-  *simple somatic mutations
-  *copy number somatic mutations
+* Country
+* Available Data Types
+  * simple somatic mutations
+  * copy number somatic mutations
   *structural somatic mutations
   *simple germline variants
   *array-based DNA-methylation
