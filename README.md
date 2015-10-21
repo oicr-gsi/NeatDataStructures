@@ -9,17 +9,17 @@ Access the ICGC Data Portal at https://dcc.icgc.org/. Select "Cancer Projects" a
 several categories that can be selected:
 *Country
 *Available Data Types
-..*simple somatic mutations
-..*copy number somatic mutations
-..*structural somatic mutations
-..*simple germline variants
-..*array-based DNA-methylation
-..*sequencing-based DNA-methylation
-..*array-based gene expression
-..*sequencing-based gene expression
-..*protein expression
-..*sequence-based miRNA	expression
-..*exon junctions
+  *simple somatic mutations
+  *copy number somatic mutations
+  *structural somatic mutations
+  *simple germline variants
+  *array-based DNA-methylation
+  *sequencing-based DNA-methylation
+  *array-based gene expression
+  *sequencing-based gene expression
+  *protein expression
+  *sequence-based miRNA	expression
+  *exon junctions
 *Tumor Type
 
 Once desired categories are selected, click on "Download Donor Data" to show file sizes and confirm file download.
