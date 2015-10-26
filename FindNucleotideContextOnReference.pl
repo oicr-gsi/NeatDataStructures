@@ -29,6 +29,9 @@ my $head = <InputPositions>;
 $head =~ s/\n|\r//;
 print OutputTrinucleotideContext "$head\tContext\n";
 
+# creating trinucleotide context data hash
+my %trinucleotide_context_data;
+   
 
 # reading the positional information
 my $line_count = 1;
@@ -78,9 +81,28 @@ while (<InputPositions>) {
    print OutputTrinucleotideContext "$_\t$context";
    
 
+
+   ###############################
+   # new section: forming the data structure
+   ###############################
+
+   my $context_code;
+   substr($context,1,1) = _;
+
+   $trinucleotide_context_data{$context_code} = $trinucleotide_context_data{$context_code} + 1; 
+
+
+
    # to keep track of progress
    unless ($line_count%10000) {
       print "processed $line_count lines\n";
    }
    $line_count++; 
 }
+   
+   # print trinucleotide contexts and corresponding totals
+   for my $context_code (keys %trinucleotide_context_data) {
+   print "$context_code\t$trinucleotide_context_data{$context_code}\n";
+}
+
+
