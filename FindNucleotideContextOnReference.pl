@@ -86,9 +86,12 @@ while (<InputPositions>) {
    # new section: forming the data structure
    ###############################
 
-   my $context_code;
-   substr($context,1,1) = _;
-
+   # to create N_N contexts for data structure, context_code is defined as the trinucleotide context with a blank middle allele
+   my $context_code=$context;
+   $context_code =~ s/\n|\r//;
+   substr($context_code,1,1) = "_";
+   
+   # context_codes are totalled
    $trinucleotide_context_data{$context_code} = $trinucleotide_context_data{$context_code} + 1; 
 
 
@@ -98,11 +101,11 @@ while (<InputPositions>) {
       print "processed $line_count lines\n";
    }
    $line_count++; 
-}
+} 
+# end working through the input file
    
-   # print trinucleotide contexts and corresponding totals
-   for my $context_code (keys %trinucleotide_context_data) {
-   print "$context_code\t$trinucleotide_context_data{$context_code}\n";
+# print trinucleotide contexts and corresponding totals
+for my $context_code (keys %trinucleotide_context_data) {
+   print "$context_code $trinucleotide_context_data{$context_code}\n";
 }
-
 
