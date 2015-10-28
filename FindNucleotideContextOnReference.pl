@@ -31,7 +31,8 @@ print OutputTrinucleotideContext "$head\tContext\n";
 
 # creating trinucleotide context data hash
 my %trinucleotide_context_data;
-   
+my %context_tally_across_mutated_to;   
+
 
 # reading the positional information
 my $line_count = 1;
@@ -91,8 +92,13 @@ while (<InputPositions>) {
    $context_code =~ s/\n|\r//;
    substr($context_code,1,1) = "_";
    
+   # create variables for mutated_from and  mutated_to nucleotides
+   my $mutated_from = $line[9];
+   my $mutated_to = $line[10];
+
    # context_codes are totalled
-   $trinucleotide_context_data{$context_code} = $trinucleotide_context_data{$context_code} + 1; 
+   $trinucleotide_context_data{$context_code}{$mutated_from}{$mutated_to} = $trinucleotide_context_data{$context_code}{$mutated_from}{$mutated_to} + 1; 
+   $context_tally_across_mutated_to{$context_code}{$mutated_from} = $context_tally_across_mutated_to{$context_code}{$mutated_from} + 1; 
 
 
 
@@ -105,7 +111,39 @@ while (<InputPositions>) {
 # end working through the input file
    
 # print trinucleotide contexts and corresponding totals
-for my $context_code (keys %trinucleotide_context_data) {
-   print "$context_code $trinucleotide_context_data{$context_code}\n";
+#foreach my $context_code (keys %trinucleotide_context_data) {
+ #  print "$context_code $trinucleotide_context_data{$context_code}\n";
+  # open(OutputTrinucleotideContext, '>', $ARGV[3]) || die("Could not open file!");
+#}
+
+
+# print trinucleotide contexts and corresponding totals for every mutated_to nucleotide
+foreach my $context_code (keys %trinucleotide_context_data) {
+
+   my $outfilename = $context_code."SNPstats.matrix";
+   
+   open(trinucleotide_file_handle, '>', $outfilename) || die("Could not open file!");
+   
+   my $context_sum = 0;
+
+   foreach my $mutated_from_nucl_key (keys %{ $trinucleotide_context_data{$context_code} }) {
+   foreach my $mutated_to_nucl_key (keys %{ $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key} }) {
+      print "$context_code, $mutated_from_nucl_key, $mutated_to_nucl_key $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key}\n";
+      $context_sum = $context_sum + $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key};
+      }
+   print trinucleotide_file_handle "$context_code, $mutated_from_nucl_key, $mutated_to_nucl_key $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key} / $context_tally_across_mutated_to{$context_code}{$mutated_from_nucl_key}\n";
+   }
+   print "\n $context_code $context_sum \n\n";
 }
+
+
+
+#foreach my $name (sort keys %grades) {
+#    foreach my $subject (keys %{ $grades{$name} }) {
+#        print "$name, $subject: $grades{$name}{$subject}\n";
+#    }
+#}
+
+
+
 
