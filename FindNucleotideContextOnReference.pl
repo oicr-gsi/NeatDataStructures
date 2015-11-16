@@ -110,39 +110,59 @@ while (<InputPositions>) {
 } 
 # end working through the input file
    
-# print trinucleotide contexts and corresponding totals
-#foreach my $context_code (keys %trinucleotide_context_data) {
- #  print "$context_code $trinucleotide_context_data{$context_code}\n";
-  # open(OutputTrinucleotideContext, '>', $ARGV[3]) || die("Could not open file!");
-#}
+
+
+
+
+   # define nucleotide array
+   my @nucleotides = ("A", "T", "C", "G");
+   
+   foreach my $nt1 (@nucleotides) {
+      foreach my $nt3 (@nucleotides) {
+               my $trinucleotide_SNP_probability_file_name = "trinucleotide_probability.".$nt1."_".$nt3;
+               # open($trinucleotide_SNP_probability, '>', $ARGV[4]) || die("Could not open file!");
+               print "$trinucleotide_SNP_probability_file_name\n";
+      }
+  }
+
 
 
 # print trinucleotide contexts and corresponding totals for every mutated_to nucleotide
 foreach my $context_code (keys %trinucleotide_context_data) {
 
-   my $outfilename = $context_code."SNPstats.matrix";
+  # my $outfilename = $context_code."SNPstats.matrix";   
+  # open(trinucleotide_file_handle, '>', $outfilename) || die("Could not open file!");
    
-   open(trinucleotide_file_handle, '>', $outfilename) || die("Could not open file!");
-   
-   my $context_sum = 0;
 
-   foreach my $mutated_from_nucl_key (keys %{ $trinucleotide_context_data{$context_code} }) {
-   foreach my $mutated_to_nucl_key (keys %{ $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key} }) {
-      print "$context_code, $mutated_from_nucl_key, $mutated_to_nucl_key $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key}\n";
-      $context_sum = $context_sum + $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key};
-      }
-   print trinucleotide_file_handle "$context_code, $mutated_from_nucl_key, $mutated_to_nucl_key $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key} / $context_tally_across_mutated_to{$context_code}{$mutated_from_nucl_key}\n";
-   }
-   print "\n $context_code $context_sum \n\n";
-}
+               foreach my $mutated_from_nucl_key (keys %{ $trinucleotide_context_data{$context_code} }) {
+      
+                  # define the "mutated_to" keys in trinuc context hash
+                  my $mutated_to_nucl_key;
+
+                  # the sum is only across mutated_to, and will be redefined for each mutated_from
+                  my $context_sum_across_mutated_to = 0;
+
+                  print "\nRaw counts for mutated_from $mutated_from_nucl_key \n";
+                  foreach $mutated_to_nucl_key (keys %{ $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key} }) {
+                     print "$context_code, $mutated_from_nucl_key, $mutated_to_nucl_key -- $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key}\n";
+                     $context_sum_across_mutated_to = $context_sum_across_mutated_to + $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key};
+               }# end of loop over mutated_to
 
 
+               print "\nProbabilities for mutated_from $mutated_from_nucl_key:\n";
+               foreach $mutated_to_nucl_key (keys %{ $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key} }) {
+                  my $SNP_probability = $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key}/$context_sum_across_mutated_to;
+                  print "$context_code, $mutated_from_nucl_key, $mutated_to_nucl_key, context_sum_across_mutated_to=$context_sum_across_mutated_to -- $SNP_probability\n";
+               }# end of loop over mutated_to
 
-#foreach my $name (sort keys %grades) {
-#    foreach my $subject (keys %{ $grades{$name} }) {
-#        print "$name, $subject: $grades{$name}{$subject}\n";
-#    }
-#}
+
+            }# end of loop over mutated_from
+
+
+   print "\n\n";
+
+}  # end loop over trinuc contexts
+
 
 
 
