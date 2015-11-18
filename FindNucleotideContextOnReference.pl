@@ -112,6 +112,9 @@ while (<InputPositions>) {
    
 
 
+# define the output file name for InDels and open it for writing
+   my $indel_prob_file_name = "other_small_substitutions";
+   open(my $indel_prob_handle, '>>', $indel_prob_file_name) || die("Could not open file!");
 
 
 # define nucleotide array
@@ -124,8 +127,10 @@ foreach my $nt1 (@nucleotides) {
       # define the output file name and open it for writing
       my $trinucleotide_SNP_probability_file_name = "trinucleotide_probability.".$nt1."_".$nt3;
       open(my $trinuc_prob_handle, '>', $trinucleotide_SNP_probability_file_name) || die("Could not open file!");
-      # print "$trinucleotide_SNP_probability_file_name\n";
 
+      # define the output file name for InDels and open it for writing
+      # my $indel_prob_file_name = "other_small_substitutions";
+      # open(my $indel_prob_handle, '>', $indel_prob_file_name) || die("Could not open file!");
 
 
       # print trinucleotide contexts and corresponding totals for every mutated_to nucleotide
@@ -139,7 +144,7 @@ foreach my $nt1 (@nucleotides) {
 
             # the sum is only across mutated_to, and will be redefined for each mutated_from
             my $context_sum_across_mutated_to = 0;
-
+            my $context_sum_across_indel = 0;
             print "\nRaw counts for mutated_from $mutated_from_nucl_key \n";
 
 
@@ -153,9 +158,29 @@ foreach my $nt1 (@nucleotides) {
                            # print "$context_code, $mutated_from_nucl_key, $mutated_to_nucl_key -- $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key}\n";
                            $context_sum_across_mutated_to = $context_sum_across_mutated_to + $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key};
                         }# end if statement
+
+                        else {
+                           $context_sum_across_indel = $context_sum_across_indel + $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key};
+                        }# end else statement
+
                      }# end if statement
+
+                     else {
+                        $context_sum_across_indel = $context_sum_across_indel + $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key};
+                     }# end else statement
+
                   }# end if statement
+
+                  else {
+                     $context_sum_across_indel = $context_sum_across_indel + $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key};
+                     }# end else statement
+
                }# end if statement
+
+               else {
+                  $context_sum_across_indel = $context_sum_across_indel + $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key};
+               }# end else statement
+
                print "$context_code, $mutated_from_nucl_key, $mutated_to_nucl_key -- $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key}\n";
             }# end of loop over mutated_to
             print "\nProbabilities for mutated_from $mutated_from_nucl_key:\n";
@@ -172,13 +197,36 @@ foreach my $nt1 (@nucleotides) {
                            print "$context_code, $mutated_from_nucl_key, $mutated_to_nucl_key, context_sum_across_mutated_to=$context_sum_across_mutated_to -- $SNP_probability\n";
                            print $trinuc_prob_handle "$context_code, $mutated_from_nucl_key, $mutated_to_nucl_key, context_sum_across_mutated_to=$context_sum_across_mutated_to -- $SNP_probability\n";
                         }# end of if statement
+
+                        else {
+                           my $indel_probability = $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key}/$context_sum_across_indel;
+                           print $indel_prob_handle "$context_code, $mutated_from_nucl_key, $mutated_to_nucl_key, context_sum_across_indel=$context_sum_across_indel -- $indel_probability\n";
+                        }# end else statement
+
                      }# end of if statement
+
+                     else {
+                        my $indel_probability = $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key}/$context_sum_across_indel;
+                        print $indel_prob_handle "$context_code, $mutated_from_nucl_key, $mutated_to_nucl_key, context_sum_across_indel=$context_sum_across_indel -- $indel_probability\n";
+               }# end else statement
+
                   }# end of if statement
-               }# end of if statement  
+
+                  else {
+                     my $indel_probability = $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key}/$context_sum_across_indel;
+                     print $indel_prob_handle "$context_code, $mutated_from_nucl_key, $mutated_to_nucl_key, context_sum_across_indel=$context_sum_across_indel -- $indel_probability\n";
+                  }# end else statement
+
+               }# end of if statement
+              
+               else {
+                  my $indel_probability = $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key}/$context_sum_across_indel;
+                  print $indel_prob_handle "$context_code, $mutated_from_nucl_key, $mutated_to_nucl_key, context_sum_across_indel=$context_sum_across_indel -- $indel_probability\n";
+               }# end else statement
+ 
             }# end of loop over mutated_to
 
          }# end of loop over mutated_from
-
      #}# close the foreach context_code loop
 
      print "\n\n";
@@ -186,7 +234,7 @@ foreach my $nt1 (@nucleotides) {
 
 
   }# end loop over nt3
-}  # end loop over nt1
+}# end loop over nt1
 
 
 
