@@ -173,7 +173,7 @@ foreach my $nt1 (@nucleotides) {
 
                   else {
                      $context_sum_across_indel = $context_sum_across_indel + $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key};
-                     }# end else statement
+                  }# end else statement
 
                }# end if statement
 
@@ -208,7 +208,7 @@ foreach my $nt1 (@nucleotides) {
                      else {
                         my $indel_probability = $trinucleotide_context_data{$context_code}{$mutated_from_nucl_key}{$mutated_to_nucl_key}/$context_sum_across_indel;
                         print $indel_prob_handle "$context_code, $mutated_from_nucl_key, $mutated_to_nucl_key, context_sum_across_indel=$context_sum_across_indel -- $indel_probability\n";
-               }# end else statement
+                     }# end else statement
 
                   }# end of if statement
 
