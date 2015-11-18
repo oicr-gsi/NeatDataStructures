@@ -113,8 +113,8 @@ while (<InputPositions>) {
 
 
 # define the output file name for InDels and open it for writing
-   my $indel_prob_file_name = "other_small_substitutions";
-   open(my $indel_prob_handle, '>>', $indel_prob_file_name) || die("Could not open file!");
+my $indel_prob_file_name = "other_small_substitutions";
+open(my $indel_prob_handle, '>>', $indel_prob_file_name) || die("Could not open file!");
 
 
 # define nucleotide array
