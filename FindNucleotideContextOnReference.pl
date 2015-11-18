@@ -128,13 +128,8 @@ foreach my $nt1 (@nucleotides) {
       my $trinucleotide_SNP_probability_file_name = "trinucleotide_probability.".$nt1."_".$nt3;
       open(my $trinuc_prob_handle, '>', $trinucleotide_SNP_probability_file_name) || die("Could not open file!");
 
-      # define the output file name for InDels and open it for writing
-      # my $indel_prob_file_name = "other_small_substitutions";
-      # open(my $indel_prob_handle, '>', $indel_prob_file_name) || die("Could not open file!");
-
 
       # print trinucleotide contexts and corresponding totals for every mutated_to nucleotide
-      #foreach my $context_code (keys %trinucleotide_context_data) {
       my $context_code=$nt1."_".$nt3;
 
          foreach my $mutated_from_nucl_key (keys %{ $trinucleotide_context_data{$context_code} }) {
@@ -227,11 +222,9 @@ foreach my $nt1 (@nucleotides) {
             }# end of loop over mutated_to
 
          }# end of loop over mutated_from
-     #}# close the foreach context_code loop
 
      print "\n\n";
      
-
 
   }# end loop over nt3
 }# end loop over nt1
