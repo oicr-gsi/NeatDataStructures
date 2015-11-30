@@ -29,9 +29,11 @@ my $head = <InputPositions>;
 $head =~ s/\n|\r//;
 print OutputTrinucleotideContext "$head\tContext\n";
 
-# creating trinucleotide context data hash
+# creating trinucleotide context data hash, insertion and deletion counts
 my %trinucleotide_context_data;
 my %context_tally_across_mutated_to;   
+my $insertion_total;
+my $deletion_total;
 
 
 # reading the positional information
@@ -100,8 +102,16 @@ while (<InputPositions>) {
    $trinucleotide_context_data{$context_code}{$mutated_from}{$mutated_to} = $trinucleotide_context_data{$context_code}{$mutated_from}{$mutated_to} + 1; 
    $context_tally_across_mutated_to{$context_code}{$mutated_from} = $context_tally_across_mutated_to{$context_code}{$mutated_from} + 1; 
 
+   # total insertions and deletions
+   if ($mutated_from eq "-") {
+      $insertion_total = $insertion_total + 1;
+   }
+   if ($mutated_to eq "-") {
+      $deletion_total = $deletion_total + 1;
+   }
+  
 
-
+ 
    # to keep track of progress
    unless ($line_count%10000) {
       print "processed $line_count lines\n";
@@ -112,9 +122,14 @@ while (<InputPositions>) {
    
 
 
+# print indel totals
+print "Insertions $insertion_total";
+print "Deletions $deletion_total";
+
+
 # define the output file name for InDels and open it for writing
-my $indel_prob_file_name = "other_small_substitutions";
-open(my $indel_prob_handle, '>>', $indel_prob_file_name) || die("Could not open file!");
+my $indel_prob_file_name = "TEST_other_small_substitutions";
+open(my $indel_prob_handle, '>', $indel_prob_file_name) || die("Could not open file!");
 
 
 # define nucleotide array
@@ -123,9 +138,8 @@ my @nucleotides = ("A", "C", "G", "T");
 foreach my $nt1 (@nucleotides) {
    foreach my $nt3 (@nucleotides) {
 
-
       # define the output file name and open it for writing
-      my $trinucleotide_SNP_probability_file_name = "trinucleotide_probability.".$nt1."_".$nt3;
+      my $trinucleotide_SNP_probability_file_name = "TEST_trinucleotide_probability.".$nt1."_".$nt3;
       open(my $trinuc_prob_handle, '>', $trinucleotide_SNP_probability_file_name) || die("Could not open file!");
 
 
