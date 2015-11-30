@@ -118,7 +118,7 @@ open(my $indel_prob_handle, '>>', $indel_prob_file_name) || die("Could not open 
 
 
 # define nucleotide array
-my @nucleotides = ("A", "T", "C", "G");
+my @nucleotides = ("A", "C", "G", "T");
    
 foreach my $nt1 (@nucleotides) {
    foreach my $nt3 (@nucleotides) {
@@ -229,7 +229,6 @@ foreach my $nt1 (@nucleotides) {
 
   }# end loop over nt3
 }# end loop over nt1
-
 
 
 
