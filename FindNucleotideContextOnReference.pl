@@ -31,7 +31,9 @@ print OutputTrinucleotideContext "$head\tContext\n";
 
 # creating trinucleotide context data hash, insertion and deletion counts
 my %trinucleotide_context_data;
-my %context_tally_across_mutated_to;   
+my %context_tally_across_mutated_to;
+my %insertion_hash;
+my %deletion_hash;   
 my $insertion_total;
 my $deletion_total;
 
@@ -98,9 +100,26 @@ while (<InputPositions>) {
    my $mutated_from = $line[9];
    my $mutated_to = $line[10];
 
+   # define length of insertions and deletions
+   # if ($mutated_from eq "-") {
+   my $insertion_length = length( $mutated_to );
+   # }
+
+   # if ($mutated_to eq "-") {
+   my $deletion_length = length( $mutated_from );
+   # }
+
    # context_codes are totalled
    $trinucleotide_context_data{$context_code}{$mutated_from}{$mutated_to} = $trinucleotide_context_data{$context_code}{$mutated_from}{$mutated_to} + 1; 
    $context_tally_across_mutated_to{$context_code}{$mutated_from} = $context_tally_across_mutated_to{$context_code}{$mutated_from} + 1; 
+
+   # insertion and deletion lengths are totalled
+   if ($mutated_from eq "-") {
+      $insertion_hash{$insertion_length} = $insertion_hash{$insertion_length} + 1;
+   }
+   if ($mutated_to eq "-") {
+      $deletion_hash{$deletion_length} = $deletion_hash{$deletion_length} + 1;
+   }
 
    # total insertions and deletions
    if ($mutated_from eq "-") {
@@ -119,18 +138,24 @@ while (<InputPositions>) {
    $line_count++; 
 } 
 # end working through the input file
+
+
    
-
-
-# print indel totals
-print "Insertions $insertion_total";
-print "Deletions $deletion_total";
-
-
 # define the output file name for InDels and open it for writing
 my $indel_prob_file_name = "TEST_other_small_substitutions";
 open(my $indel_prob_handle, '>', $indel_prob_file_name) || die("Could not open file!");
 
+
+# print indel totals
+print "Insertions $insertion_total\n";
+print "Deletions $deletion_total\n";
+foreach my $insertion_length (sort(keys %insertion_hash)) {
+   print "Insertion, $insertion_length, total , $insertion_hash{$insertion_length}\n";
+}
+foreach my $deletion_length (sort(keys %deletion_hash)) {
+   print "Deletion, $deletion_length, total, $deletion_hash{$deletion_length}\n";
+}
+ 
 
 # define nucleotide array
 my @nucleotides = ("A", "C", "G", "T");
