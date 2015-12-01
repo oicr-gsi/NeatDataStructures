@@ -146,13 +146,21 @@ my $indel_prob_file_name = "TEST_other_small_substitutions";
 open(my $indel_prob_handle, '>', $indel_prob_file_name) || die("Could not open file!");
 
 
-# print indel totals
+# print InDel totals
 print "Insertions $insertion_total\n";
 print "Deletions $deletion_total\n";
+
+# calculate InDel length totals and probability out of total number of insertions/deletions. Print probabilities to file.
 foreach my $insertion_length (sort(keys %insertion_hash)) {
+   my $insertion_probability;
+   $insertion_probability = $insertion_hash{$insertion_length}/$insertion_total;
+   print $indel_prob_handle "Insertion of Length $insertion_length -- $insertion_probability\n";
    print "Insertion, $insertion_length, total , $insertion_hash{$insertion_length}\n";
 }
 foreach my $deletion_length (sort(keys %deletion_hash)) {
+   my $deletion_probability;
+   $deletion_probability = $deletion_hash{$deletion_length}/$deletion_total;
+   print $indel_prob_handle "Deletion of Length $deletion_length -- $deletion_probability\n";
    print "Deletion, $deletion_length, total, $deletion_hash{$deletion_length}\n";
 }
  
