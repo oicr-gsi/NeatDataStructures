@@ -143,31 +143,44 @@ while (<InputPositions>) {
 my $mutation_total = $line_count - 1;
 print "Number of Mutations -- $mutation_total\n";
    
-# define the output file name for InDels and open it for writing
-my $indel_prob_file_name = "TEST_other_small_mutations";
-open(my $indel_prob_handle, '>', $indel_prob_file_name) || die("Could not open file!");
+# define the output file name for insertions, deletions, and overall likelihoods. Open files for writing
+my $insertion_file_name = "TEST_insertions";
+open(my $insertion_prob_handle, '>', $insertion_file_name) || die("Could not open file!");
+
+my $deletion_file_name = "TEST_deletions";
+open(my $deletion_prob_handle, '>', $deletion_file_name) || die("Could not open file!");
+
+my $overall_file_name = "TEST_overall_likelihoods";
+open(my $overall_prob_handle, '>', $overall_file_name) || die("Could not open file!");
+
+# print overall likelihood file headers
+print $overall_prob_handle "mutation_type\tprobability\n";
 
 # print insertions and deletion probabilities out of all mutations
 my $insertion_prob_all = $insertion_total / $mutation_total;
 my $deletion_prob_all = $deletion_total / $mutation_total;
-print $indel_prob_handle "Insertion Probability -- $insertion_prob_all\n";
-print $indel_prob_handle "Deletion Probability -- $deletion_prob_all\n";
+print $overall_prob_handle "insertion\t$insertion_prob_all\ndeletion\t$deletion_prob_all\n";
+# print $overall_prob_handle "Deletion Probability -- $deletion_prob_all\n";
 
 # print InDel totals
 print "Insertions $insertion_total\n";
 print "Deletions $deletion_total\n";
 
+# print insertion and deletion headers
+print $insertion_prob_handle "insertion_length\tprobability\n";
+print $deletion_prob_handle "deletion_length\tprobability\n";
+
 # calculate InDel length totals and probability out of total number of insertions/deletions. Print probabilities to file.
 foreach my $insertion_length (sort(keys %insertion_hash)) {
    my $insertion_probability;
    $insertion_probability = $insertion_hash{$insertion_length}/$insertion_total;
-   print $indel_prob_handle "Insertion of Length $insertion_length -- $insertion_probability\n";
+   print $insertion_prob_handle "$insertion_length\t$insertion_probability\n";
    print "Insertion, $insertion_length, total , $insertion_hash{$insertion_length}\n";
 }
 foreach my $deletion_length (sort(keys %deletion_hash)) {
    my $deletion_probability;
    $deletion_probability = $deletion_hash{$deletion_length}/$deletion_total;
-   print $indel_prob_handle "Deletion of Length $deletion_length -- $deletion_probability\n";
+   print $deletion_prob_handle "$deletion_length\t$deletion_probability\n";
    print "Deletion, $deletion_length, total, $deletion_hash{$deletion_length}\n";
 }
  
@@ -250,17 +263,17 @@ foreach my $nt1 (@nucleotides) {
                         }# end of if statement
                         else {
                            my $indel_probability = $trinucleotide_context_data{$context_code}{$mutated_from}{$mutated_to}/$context_sum_across_indel;
-                           print $indel_prob_handle "$context_code, $mutated_from, $mutated_to, context_sum_across_indel=$context_sum_across_indel -- $indel_probability\n";
+                           # print $indel_prob_handle "$context_code, $mutated_from, $mutated_to, context_sum_across_indel=$context_sum_across_indel -- $indel_probability\n";
                         }# end else statement
                      }# end of if statement
                      else {
-                        my $indel_probability = $trinucleotide_context_data{$context_code}{$mutated_from}{$mutated_to}/$context_sum_across_indel;
-                        print $indel_prob_handle "$context_code, $mutated_from, $mutated_to, context_sum_across_indel=$context_sum_across_indel -- $indel_probability\n";
+                        # my $indel_probability = $trinucleotide_context_data{$context_code}{$mutated_from}{$mutated_to}/$context_sum_across_indel;
+                        # print $indel_prob_handle "$context_code, $mutated_from, $mutated_to, context_sum_across_indel=$context_sum_across_indel -- $indel_probability\n";
                      }# end else statement
                   }# end of if statement
                   else {
-                     my $indel_probability = $trinucleotide_context_data{$context_code}{$mutated_from}{$mutated_to}/$context_sum_across_indel;
-                     print $indel_prob_handle "$context_code, $mutated_from, $mutated_to, context_sum_across_indel=$context_sum_across_indel -- $indel_probability\n";
+                     # my $indel_probability = $trinucleotide_context_data{$context_code}{$mutated_from}{$mutated_to}/$context_sum_across_indel;
+                     # print $indel_prob_handle "$context_code, $mutated_from, $mutated_to, context_sum_across_indel=$context_sum_across_indel -- $indel_probability\n";
                   }# end else statement
                }# end of if statement
                else {
@@ -269,8 +282,8 @@ foreach my $nt1 (@nucleotides) {
                      $indel_probability = 0;
                   }
                   else {
-                     $indel_probability = $trinucleotide_context_data{$context_code}{$mutated_from}{$mutated_to}/$context_sum_across_indel;
-                     print $indel_prob_handle "$context_code, $mutated_from, $mutated_to, context_sum_across_indel=$context_sum_across_indel -- $indel_probability\n";
+                     # $indel_probability = $trinucleotide_context_data{$context_code}{$mutated_from}{$mutated_to}/$context_sum_across_indel;
+                     # print $indel_prob_handle "$context_code, $mutated_from, $mutated_to, context_sum_across_indel=$context_sum_across_indel -- $indel_probability\n";
                   }
                }# end else statement
             }# end of loop over mutated_to
