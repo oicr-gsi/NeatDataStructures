@@ -139,12 +139,19 @@ while (<InputPositions>) {
 } 
 # end working through the input file
 
-
+# print total number of mutations
+my $mutation_total = $line_count - 1;
+print "Number of Mutations -- $mutation_total\n";
    
 # define the output file name for InDels and open it for writing
 my $indel_prob_file_name = "TEST_other_small_mutations";
 open(my $indel_prob_handle, '>', $indel_prob_file_name) || die("Could not open file!");
 
+# print insertions and deletion probabilities out of all mutations
+my $insertion_prob_all = $insertion_total / $mutation_total;
+my $deletion_prob_all = $deletion_total / $mutation_total;
+print $indel_prob_handle "Insertion Probability -- $insertion_prob_all\n";
+print $indel_prob_handle "Deletion Probability -- $deletion_prob_all\n";
 
 # print InDel totals
 print "Insertions $insertion_total\n";
