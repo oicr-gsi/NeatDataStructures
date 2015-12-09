@@ -144,13 +144,13 @@ my $mutation_total = $line_count - 1;
 print "Number of Mutations -- $mutation_total\n";
    
 # define the output file name for insertions, deletions, and overall likelihoods. Open files for writing
-my $insertion_file_name = "TEST_insertions";
+my $insertion_file_name = "Breast_insLength.prob";
 open(my $insertion_prob_handle, '>', $insertion_file_name) || die("Could not open file!");
 
-my $deletion_file_name = "TEST_deletions";
+my $deletion_file_name = "Breast_delLength.prob";
 open(my $deletion_prob_handle, '>', $deletion_file_name) || die("Could not open file!");
 
-my $overall_file_name = "TEST_overall_likelihoods";
+my $overall_file_name = "Breast_overall.prob";
 open(my $overall_prob_handle, '>', $overall_file_name) || die("Could not open file!");
 
 # print overall likelihood file headers
@@ -192,7 +192,7 @@ foreach my $nt1 (@nucleotides) {
    foreach my $nt3 (@nucleotides) {
 
       # define the output file name and open it for writing
-      my $trinucleotide_SNP_probability_file_name = "TEST_trinucleotide_probability.".$nt1."_".$nt3;
+      my $trinucleotide_SNP_probability_file_name = "Breast_".$nt1."-".$nt3.".trinuc";
       open(my $trinuc_prob_handle, '>', $trinucleotide_SNP_probability_file_name) || die("Could not open file!");
 
 
@@ -258,8 +258,13 @@ foreach my $nt1 (@nucleotides) {
                            else {
                               $SNP_probability = $trinucleotide_context_data{$context_code}{$mutated_from}{$mutated_to}/$context_sum_across_mutated_to;
                            }
-                           # print "$context_code, $mutated_from, $mutated_to, context_sum_across_mutated_to=$context_sum_across_mutated_to -- $SNP_probability\n";
-                           print $trinuc_prob_handle "$SNP_probability\t";
+                           if ( $mutated_to eq "T" ) {
+                              print $trinuc_prob_handle "$SNP_probability";
+                           }
+                           else {
+                              # print "$context_code, $mutated_from, $mutated_to, context_sum_across_mutated_to=$context_sum_across_mutated_to -- $SNP_probability\n";
+                              print $trinuc_prob_handle "$SNP_probability\t";
+                           }
                         }# end of if statement
                         else {
                            my $indel_probability = $trinucleotide_context_data{$context_code}{$mutated_from}{$mutated_to}/$context_sum_across_indel;
