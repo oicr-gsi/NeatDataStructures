@@ -68,20 +68,20 @@ while (<InputPositions>) {
    $context = uc($context);
 
    # split germline column into germline allele and mutated_to allele
-   my @germline = split ('/', $line[6]);
+   # my @germline = split ('/', $line[6]);
 
    # if germline allele does not equal reference allele, print "start_region germline allele end_region"
    # specifically, replace the middle letter of the context with the germline allele
    #print "$germline[0], $germline[1]\n";
-   if ($germline[0] ne $germline[1]) {
-      print "germline/reference mismatch, line number $line_count\n";
-      if ($coordinate != 1) {
-         substr($context,1,1)= $germline[1];   
-      }
-      else {
-         substr($context,0,1)= $germline[1];
-      }
-   }
+   # if ($germline[0] ne $germline[1]) {
+      # print "germline/reference mismatch, line number $line_count\n";
+      # if ($coordinate != 1) {
+         # substr($context,1,1)= $germline[1];   
+      # }
+      # else {
+        #  substr($context,0,1)= $germline[1];
+      # }
+   # }
 
    print OutputTrinucleotideContext "$_\t$context";
    
@@ -144,13 +144,13 @@ my $mutation_total = $line_count - 1;
 print "Number of Mutations -- $mutation_total\n";
    
 # define the output file name for insertions, deletions, and overall likelihoods. Open files for writing
-my $insertion_file_name = "Breast_insLength.prob";
+my $insertion_file_name = "Leukemia_OPEN_insLength.prob";
 open(my $insertion_prob_handle, '>', $insertion_file_name) || die("Could not open file!");
 
-my $deletion_file_name = "Breast_delLength.prob";
+my $deletion_file_name = "Leukemia_OPEN_delLength.prob";
 open(my $deletion_prob_handle, '>', $deletion_file_name) || die("Could not open file!");
 
-my $overall_file_name = "Breast_overall.prob";
+my $overall_file_name = "Leukemia_OPEN_overall.prob";
 open(my $overall_prob_handle, '>', $overall_file_name) || die("Could not open file!");
 
 # print overall likelihood file headers
@@ -192,7 +192,7 @@ foreach my $nt1 (@nucleotides) {
    foreach my $nt3 (@nucleotides) {
 
       # define the output file name and open it for writing
-      my $trinucleotide_SNP_probability_file_name = "Breast_".$nt1."-".$nt3.".trinuc";
+      my $trinucleotide_SNP_probability_file_name = "Leukemia_OPEN_".$nt1."-".$nt3.".trinuc";
       open(my $trinuc_prob_handle, '>', $trinucleotide_SNP_probability_file_name) || die("Could not open file!");
 
 
