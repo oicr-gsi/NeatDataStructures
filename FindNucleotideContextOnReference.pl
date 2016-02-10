@@ -34,6 +34,7 @@ my %trinucleotide_context_data;
 my %context_tally_across_mutated_to;
 my %insertion_hash;
 my %deletion_hash;   
+my %consequence_hash;
 my $insertion_total;
 my $deletion_total;
 
@@ -49,6 +50,12 @@ while (<InputPositions>) {
    # fastahack will need to the chromosome and coordinate to read the information from the reference
    my $chromosome = $line[0];
    my $coordinate = $line[1];
+   
+   # defining consequence type column
+   my $consequence_type = $line[11];
+
+   # checking if column index is correct
+   # print "$consequence_type\n";
 
    # get coordinates of first and last character in the context
    my $start_region = $coordinate - 1;
@@ -129,7 +136,8 @@ while (<InputPositions>) {
       $deletion_total = $deletion_total + 1;
    }
   
-
+   # forming the consequence type data structure, totalling each type
+   $consequence_hash{$consequence_type} = $consequence_hash{$consequence_type} + 1;
  
    # to keep track of progress
    unless ($line_count%10000) {
@@ -142,6 +150,10 @@ while (<InputPositions>) {
 # print total number of mutations
 my $mutation_total = $line_count - 1;
 print "Number of Mutations -- $mutation_total\n";
+
+# define output file name for consequence types, open for writing
+my $consequence_file_name = "Consequence_Types.prob";
+open(my $consequence_prob_handle, '>', $consequence_file_name) || die("Could not open file!");
    
 # define the output file name for insertions, deletions, and overall likelihoods. Open files for writing
 my $insertion_file_name = "Melanoma_insLength.prob";
@@ -169,6 +181,14 @@ print "Deletions $deletion_total\n";
 # print insertion and deletion headers
 print $insertion_prob_handle "insertion_length\tprobability\n";
 print $deletion_prob_handle "deletion_length\tprobability\n";
+
+# calculate consequence type totals and frequency out of all mutations. Print to file
+foreach my $consequence_type (sort(keys %consequence_hash)) {
+   my $consequence_frequency;
+   $consequence_frequency = $consequence_hash{$consequence_type}/$mutation_total;
+   print $consequence_prob_handle "$consequence_type\t$consequence_frequency\n";
+   print "$consequence_type $consequence_hash{$consequence_type}\n";
+}
 
 # calculate InDel length totals and probability out of total number of insertions/deletions. Print probabilities to file.
 foreach my $insertion_length (sort(keys %insertion_hash)) {
