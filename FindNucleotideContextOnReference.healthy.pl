@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 use strict;
+use Math::Round;
 
 
 if ($#ARGV < 1) {
@@ -86,7 +87,6 @@ while (<InputPositions>) {
    print OutputTrinucleotideContext "$_\t$context";
    
 
-
    ###############################
    # new section: forming the data structure
    ###############################
@@ -100,13 +100,30 @@ while (<InputPositions>) {
    my $mutated_from = $line[3];
    my $mutated_to = $line[4];
 
+   # splitting heterozygosity by comma
+   my @zygotes = split (',', $mutated_to);
+   my $zygotes_length = scalar(@zygotes);
+
+   # identify heterozygosity, choose one at random to use
+   if ($zygotes_length > 1) {
+      my $zygotesRand = $zygotes_length*rand();
+      my $zygotesRound = round($zygotesRand) - 1;
+
+      $mutated_to = $zygotes[$zygotesRound];
+      print "@zygotes\t$mutated_to\n";
+   }  
+   # print "@zygotes\t$mutated_to\n";
+   
+   # my $round_rand_test = round(rand());
+   # print $round_rand_test;
+
    # define length of insertions and deletions
    # if ($mutated_from eq "-") {
-   my $insertion_length = length( $mutated_to );
+   my $insertion_length = length( $mutated_to ) - 1;
    # }
 
    # if ($mutated_to eq "-") {
-   my $deletion_length = length( $mutated_from );
+   my $deletion_length = length( $mutated_from ) - 1;
    # }
 
    # context_codes are totalled
@@ -114,21 +131,22 @@ while (<InputPositions>) {
    $context_tally_across_mutated_to{$context_code}{$mutated_from} = $context_tally_across_mutated_to{$context_code}{$mutated_from} + 1; 
 
    # insertion and deletion lengths are totalled
-   if ($mutated_from eq "-") {
+   if ($insertion_length > $deletion_length) {
       $insertion_hash{$insertion_length} = $insertion_hash{$insertion_length} + 1;
    }
-   if ($mutated_to eq "-") {
+   if ($deletion_length > $insertion_length) {
       $deletion_hash{$deletion_length} = $deletion_hash{$deletion_length} + 1;
    }
 
    # total insertions and deletions
-   if ($mutated_from eq "-") {
-      $insertion_total = $insertion_total + 1;
+   if ($insertion_length != $deletion_length) {
+      if ($insertion_length > $deletion_length) {
+         $insertion_total = $insertion_total + 1;
+      }
+      elsif ($deletion_length > $insertion_length) {
+         $deletion_total = $deletion_total + 1;
+      } 
    }
-   if ($mutated_to eq "-") {
-      $deletion_total = $deletion_total + 1;
-   }
-  
 
  
    # to keep track of progress
@@ -141,7 +159,7 @@ while (<InputPositions>) {
 # end working through the input file
 
 # print total number of mutations
-my $mutation_total = $line_count - 1;
+my $mutation_total = $line_count;
 print "Number of Mutations -- $mutation_total\n";
    
 # define the output file name for insertions, deletions, and overall likelihoods. Open files for writing
