@@ -77,9 +77,9 @@ ICGC tsv files contain a "Consequence Type" column that contains the consequence
 ###Overview
 This script was created to extract the same frequency models from dbSNP vcfs as were extracted from ICGC tsv files. dbSNP is an NCBI database of healthy variants that is open for use and analysis by the public. NEAT is able to use non-cancer variants for simulation.
 
-## Changes to InDel Recognition
+### Changes to InDel Recognition
 For all InDels in dbSNP, the first nucleotide upstream of the insertion or deletion is included in both the REF(mutated from) and ALT(mutated to) columns. This required an edit to the script in the way it recognizes InDels. The healthy variant script defines the length of the REF and ALT columns in nucleotides, and recognizes when length(REF) does not equal length(ALT). Mutation length totals are calculated using an insertion hash and a deletion hash with length as the keys and total as the values.
 
-## Analyzing Multi-Nucleotide Variants (in progress)
+### Analyzing Multi-Nucleotide Variants (in progress)
 dbSNP contains a small, but significant, number of nucleotide substitutions greater than one base in length. These variants were not found in ICGC simple somatic mutation data, therefore an edit is required for the healthy variant script. This is soon to be implemented.
 
