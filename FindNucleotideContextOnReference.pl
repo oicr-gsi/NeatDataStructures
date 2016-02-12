@@ -156,13 +156,13 @@ my $consequence_file_name = "Consequence_Types.prob";
 open(my $consequence_prob_handle, '>', $consequence_file_name) || die("Could not open file!");
    
 # define the output file name for insertions, deletions, and overall likelihoods. Open files for writing
-my $insertion_file_name = "Melanoma_insLength.prob";
+my $insertion_file_name = "Breast_insLength.prob";
 open(my $insertion_prob_handle, '>', $insertion_file_name) || die("Could not open file!");
 
-my $deletion_file_name = "Melanoma_delLength.prob";
+my $deletion_file_name = "Breast_delLength.prob";
 open(my $deletion_prob_handle, '>', $deletion_file_name) || die("Could not open file!");
 
-my $overall_file_name = "Melanoma_overall.prob";
+my $overall_file_name = "Breast_overall.prob";
 open(my $overall_prob_handle, '>', $overall_file_name) || die("Could not open file!");
 
 # print overall likelihood file headers
@@ -212,7 +212,7 @@ foreach my $nt1 (@nucleotides) {
    foreach my $nt3 (@nucleotides) {
 
       # define the output file name and open it for writing
-      my $trinucleotide_SNP_probability_file_name = "Melanoma_".$nt1."-".$nt3.".trinuc";
+      my $trinucleotide_SNP_probability_file_name = "Breast_".$nt1."-".$nt3.".trinuc";
       open(my $trinuc_prob_handle, '>', $trinucleotide_SNP_probability_file_name) || die("Could not open file!");
 
 
