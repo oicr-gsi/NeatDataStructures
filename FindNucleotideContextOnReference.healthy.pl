@@ -33,11 +33,12 @@ print OutputTrinucleotideContext "$head\tContext\n";
 # creating trinucleotide context data hash, insertion and deletion counts
 my %trinucleotide_context_data;
 my %context_tally_across_mutated_to;
+# my %genotype_hash;
 my %insertion_hash;
 my %deletion_hash;   
 my $insertion_total;
 my $deletion_total;
-
+my $zygotes_total;
 
 # reading the positional information
 my $line_count = 1;
@@ -100,14 +101,21 @@ while (<InputPositions>) {
    my $mutated_from = $line[3];
    my $mutated_to = $line[4];
 
-   # splitting heterozygosity by comma
+   # creating genotype variable from column 10 of VCF
+   my $genotype = $line[9];
+
+   # incrementing each genotype
+   # $genotype_hash{$genotype} = $genotype_hash{$genotype} + 1;
+
+   # splitting heterozygosity by comma, defining heterozygosity total
    my @zygotes = split (',', $mutated_to);
    my $zygotes_length = scalar(@zygotes);
 
-   # identify heterozygosity, choose one at random to use
+   # identify heterozygosity, choose one at random to use. Count heterozygosity instances
    if ($zygotes_length > 1) {
       my $zygotesRand = $zygotes_length*rand();
       my $zygotesRound = round($zygotesRand) - 1;
+      $zygotes_total = $zygotes_total + 1;
 
       $mutated_to = $zygotes[$zygotesRound];
       print "@zygotes\t$mutated_to\n";
@@ -161,6 +169,10 @@ while (<InputPositions>) {
 # print total number of mutations
 my $mutation_total = $line_count;
 print "Number of Mutations -- $mutation_total\n";
+
+# open zygosity ratio file for writing
+# my $genotype_name = "zygosity.prob";
+# open(my $genotype_handle, '>', $genotype_name) || die("Could not open file!");
    
 # define the output file name for insertions, deletions, and overall likelihoods. Open files for writing
 my $insertion_file_name = "SSM_insLength.prob";
@@ -171,6 +183,17 @@ open(my $deletion_prob_handle, '>', $deletion_file_name) || die("Could not open 
 
 my $overall_file_name = "SSM_overall.prob";
 open(my $overall_prob_handle, '>', $overall_file_name) || die("Could not open file!");
+
+my $heterozygosity_file_name = "heterozygosity.prob";
+open(my $heterozygosity_prob_handle, '>', $heterozygosity_file_name) || die("Could not open file!");
+
+# calculate zygosity ratio frequency, print to file
+# foreach my $genotype (sort(keys %genotype_hash)) {
+   # my $zygosity_frequency;
+   # $zygosity_frequency = $genotype_hash{$genotype}/$mutation_total;
+   # print $genotype_handle "$genotype\t$zygosity_frequency\n";
+   # print "Genotype, $genotype -- $genotype_hash{$genotype}\n";
+}
 
 # print overall likelihood file headers
 print $overall_prob_handle "mutation_type\tprobability\n";
@@ -203,6 +226,12 @@ foreach my $deletion_length (sort(keys %deletion_hash)) {
    print "Deletion, $deletion_length, total, $deletion_hash{$deletion_length}\n";
 }
  
+# print heterozygosity frequency to file
+my $zygote_frequency = $zygotes_total / $mutation_total;
+print $heterozygosity_prob_handle "$zygote_frequency\n";
+
+print "heterozygous alleles -- $zygotes_total\n";
+
 
 # define nucleotide array
 my @nucleotides = ("A", "C", "G", "T");
