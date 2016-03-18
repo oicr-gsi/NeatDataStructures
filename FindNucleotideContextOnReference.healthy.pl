@@ -118,7 +118,7 @@ while (<InputPositions>) {
       $zygotes_total = $zygotes_total + 1;
 
       $mutated_to = $zygotes[$zygotesRound];
-      print "@zygotes\t$mutated_to\n";
+      # print "@zygotes\t$mutated_to\n";
    }  
    # print "@zygotes\t$mutated_to\n";
    
@@ -156,7 +156,12 @@ while (<InputPositions>) {
       } 
    }
 
- 
+   # Find variant annotation in ANNOVAR outfile
+   my $annotation = $line[7];
+   $annotation =~ /Func.refGene=(.{1,30});Gene\.refGene/;
+   print "$1\n";
+   
+
    # to keep track of progress
    # 1000000 for LARGE dbsnp vcfs, 10000 for smaller vcf/tsv tumor mutation files
    unless ($line_count%10000) {
@@ -193,7 +198,7 @@ open(my $heterozygosity_prob_handle, '>', $heterozygosity_file_name) || die("Cou
    # $zygosity_frequency = $genotype_hash{$genotype}/$mutation_total;
    # print $genotype_handle "$genotype\t$zygosity_frequency\n";
    # print "Genotype, $genotype -- $genotype_hash{$genotype}\n";
-}
+# }
 
 # print overall likelihood file headers
 print $overall_prob_handle "mutation_type\tprobability\n";
