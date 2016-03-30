@@ -39,6 +39,9 @@ my %deletion_hash;
 my $insertion_total;
 my $deletion_total;
 my $zygotes_total;
+my %annotation_hash;
+my $annotation_total;
+my %exonic_consequence_hash;
 
 # reading the positional information
 my $line_count = 1;
@@ -156,11 +159,17 @@ while (<InputPositions>) {
       } 
    }
 
-   # Find variant annotation in ANNOVAR outfile
+   # Find variant annotation and exonic consequence in ANNOVAR outfile
    my $annotation = $line[7];
-   $annotation =~ /Func.refGene=(.{1,30});Gene\.refGene/;
-   print "$1\n";
-   
+   if ( $annotation =~ /Func.refGene=(.{1,30});Gene\.refGene/ ) {
+      # print "$1\n";
+      $annotation_hash{$1}++;
+      $annotation_total++;
+   }
+   if ( $annotation =~ /ExonicFunc.refGene=(.{1,30});AAChange\.refGene/ ) {
+      # print "$1\n";
+      $exonic_consequence_hash{$1}++;
+   } 
 
    # to keep track of progress
    # 1000000 for LARGE dbsnp vcfs, 10000 for smaller vcf/tsv tumor mutation files
@@ -175,11 +184,10 @@ while (<InputPositions>) {
 my $mutation_total = $line_count;
 print "Number of Mutations -- $mutation_total\n";
 
-# open zygosity ratio file for writing
+# open files for writing
 # my $genotype_name = "zygosity.prob";
 # open(my $genotype_handle, '>', $genotype_name) || die("Could not open file!");
    
-# define the output file name for insertions, deletions, and overall likelihoods. Open files for writing
 my $insertion_file_name = "SSM_insLength.prob";
 open(my $insertion_prob_handle, '>', $insertion_file_name) || die("Could not open file!");
 
@@ -192,6 +200,12 @@ open(my $overall_prob_handle, '>', $overall_file_name) || die("Could not open fi
 my $heterozygosity_file_name = "heterozygosity.prob";
 open(my $heterozygosity_prob_handle, '>', $heterozygosity_file_name) || die("Could not open file!");
 
+my $annotation_file_name = "annofreq.prob";
+open(my $annotation_handle, '>', $annotation_file_name) || die("Could not open file!");
+
+my $exonic_con_file_name = "exonic_consequences.prob";
+open(my $exonic_con_handle, '>', $exonic_con_file_name) || die("Could not open file!");
+
 # calculate zygosity ratio frequency, print to file
 # foreach my $genotype (sort(keys %genotype_hash)) {
    # my $zygosity_frequency;
@@ -199,6 +213,23 @@ open(my $heterozygosity_prob_handle, '>', $heterozygosity_file_name) || die("Cou
    # print $genotype_handle "$genotype\t$zygosity_frequency\n";
    # print "Genotype, $genotype -- $genotype_hash{$genotype}\n";
 # }
+
+# print annotation and exonic consequence frequencies
+foreach $1 (sort(keys %annotation_hash)) {
+   my $annotation_frequency;
+   $annotation_frequency = $annotation_hash{$1}/$annotation_total;
+   print "Annotation, $1 -- $annotation_hash{$1}, $annotation_frequency\n";
+   print $annotation_handle "$1\t$annotation_frequency\n";
+}
+foreach $1 (sort(keys %exonic_consequence_hash)) {
+   my $exonic_con_freq;
+   if ( $1 ne "." ) {
+      $exonic_con_freq = $exonic_consequence_hash{$1}/$annotation_total;
+      print "Exonic Consequence, $1 -- $exonic_consequence_hash{$1}, $exonic_con_freq\n";
+      print $exonic_con_handle "$1\t$exonic_con_freq\n";
+   }
+}
+print "Total Annotations -- $annotation_total\n";
 
 # print overall likelihood file headers
 print $overall_prob_handle "mutation_type\tprobability\n";
