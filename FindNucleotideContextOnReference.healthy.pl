@@ -42,6 +42,9 @@ my $zygotes_total;
 my %annotation_hash;
 my $annotation_total;
 my %exonic_consequence_hash;
+my $intronic;
+my $exonic;
+my $intergenic;
 
 # reading the positional information
 my $line_count = 1;
@@ -165,11 +168,22 @@ while (<InputPositions>) {
       # print "$1\n";
       $annotation_hash{$1}++;
       $annotation_total++;
-   }
+   }   
    if ( $annotation =~ /ExonicFunc.refGene=(.{1,30});AAChange\.refGene/ ) {
       # print "$1\n";
       $exonic_consequence_hash{$1}++;
    } 
+   if ( $annotation =~ /intronic\;/ ) {
+      $intronic++;
+   }
+   if ( $annotation !~ /ncRNA_exonic/ ) {
+      if ( $annotation =~ /exonic\;/ ) {
+         $exonic++;
+      }
+   }
+   if ( $annotation =~ /intergenic\;/ ) {
+      $intergenic++;
+   }
 
    # to keep track of progress
    # 1000000 for LARGE dbsnp vcfs, 10000 for smaller vcf/tsv tumor mutation files
@@ -217,19 +231,21 @@ open(my $exonic_con_handle, '>', $exonic_con_file_name) || die("Could not open f
 # print annotation and exonic consequence frequencies
 foreach $1 (sort(keys %annotation_hash)) {
    my $annotation_frequency;
-   $annotation_frequency = $annotation_hash{$1}/$annotation_total;
-   print "Annotation, $1 -- $annotation_hash{$1}, $annotation_frequency\n";
+   $annotation_frequency = $annotation_hash{$1}/$mutation_total;
+   print "$1 -- $annotation_hash{$1}, $annotation_frequency\n";
    print $annotation_handle "$1\t$annotation_frequency\n";
 }
 foreach $1 (sort(keys %exonic_consequence_hash)) {
    my $exonic_con_freq;
    if ( $1 ne "." ) {
-      $exonic_con_freq = $exonic_consequence_hash{$1}/$annotation_total;
-      print "Exonic Consequence, $1 -- $exonic_consequence_hash{$1}, $exonic_con_freq\n";
+      $exonic_con_freq = $exonic_consequence_hash{$1}/$mutation_total;
+      print "Exonic Consequence: $1 -- $exonic_consequence_hash{$1}, $exonic_con_freq\n";
       print $exonic_con_handle "$1\t$exonic_con_freq\n";
    }
 }
-print "Total Annotations -- $annotation_total\n";
+
+print "Intronic -- $intronic\nExonic -- $exonic\nIntergenic -- $intergenic\n";
+#print "Total Annotations -- $annotation_total\n";
 
 # print overall likelihood file headers
 print $overall_prob_handle "mutation_type\tprobability\n";
@@ -253,13 +269,13 @@ foreach my $insertion_length (sort(keys %insertion_hash)) {
    my $insertion_probability;
    $insertion_probability = $insertion_hash{$insertion_length}/$insertion_total;
    print $insertion_prob_handle "$insertion_length\t$insertion_probability\n";
-   print "Insertion, $insertion_length, total , $insertion_hash{$insertion_length}\n";
+   # print "Insertion, $insertion_length, total , $insertion_hash{$insertion_length}\n";
 }
 foreach my $deletion_length (sort(keys %deletion_hash)) {
    my $deletion_probability;
    $deletion_probability = $deletion_hash{$deletion_length}/$deletion_total;
    print $deletion_prob_handle "$deletion_length\t$deletion_probability\n";
-   print "Deletion, $deletion_length, total, $deletion_hash{$deletion_length}\n";
+   # print "Deletion, $deletion_length, total, $deletion_hash{$deletion_length}\n";
 }
  
 # print heterozygosity frequency to file
