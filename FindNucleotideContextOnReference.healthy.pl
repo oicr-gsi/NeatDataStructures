@@ -184,6 +184,15 @@ while (<InputPositions>) {
    if ( $annotation =~ /Func.refGene=.{0,15}intergenic\;/ ) {
       $intergenic++;
    }
+   elsif ( $annotation =~ /Func.refGene=.{0,15}ncRNA_splicing\;/ ) {
+      $intergenic++;
+   }
+   elsif ( $annotation =~ /Func.refGene=.{0,15}upstream\;/ ) {
+      $intergenic++;
+   }
+   elsif ( $annotation =~ /Func.refGene=.{0,15}downstream\;/ ) {
+      $intergenic++;
+   }
 
    # to keep track of progress
    # 1000000 for LARGE dbsnp vcfs, 10000 for smaller vcf/tsv tumor mutation files
