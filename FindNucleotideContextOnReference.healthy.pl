@@ -173,15 +173,15 @@ while (<InputPositions>) {
       # print "$1\n";
       $exonic_consequence_hash{$1}++;
    } 
-   if ( $annotation =~ /intronic\;/ ) {
+   if ( $annotation =~ /Func.refGene=.{0,15}intronic\;/ ) {
       $intronic++;
    }
-   if ( $annotation !~ /ncRNA_exonic/ ) {
-      if ( $annotation =~ /exonic\;/ ) {
+   if ( $annotation !~ /Func.refGene=ncRNA_exonic/ ) {
+      if ( $annotation =~ /Func.refGene=.{0,15}exonic\;/ ) {
          $exonic++;
       }
    }
-   if ( $annotation =~ /intergenic\;/ ) {
+   if ( $annotation =~ /Func.refGene=.{0,15}intergenic\;/ ) {
       $intergenic++;
    }
 
@@ -198,7 +198,10 @@ while (<InputPositions>) {
 my $mutation_total = $line_count;
 print "Number of Mutations -- $mutation_total\n";
 
-# open files for writing
+
+######################### open files for writing ##########################
+
+
 # my $genotype_name = "zygosity.prob";
 # open(my $genotype_handle, '>', $genotype_name) || die("Could not open file!");
    
@@ -219,6 +222,19 @@ open(my $annotation_handle, '>', $annotation_file_name) || die("Could not open f
 
 my $exonic_con_file_name = "exonic_consequences.prob";
 open(my $exonic_con_handle, '>', $exonic_con_file_name) || die("Could not open file!");
+
+my $intronic_file_name = "intronic_vars.prob";
+open(my $intronic_handle, '>', $intronic_file_name) || die("Could not open file!");
+
+my $exonic_file_name = "exonic_vars.prob";
+open(my $exonic_handle, '>', $exonic_file_name) || die ("Could not open file!");
+
+my $intergenic_file_name = "intergenic_vars.prob";
+open(my $intergenic_handle, '>', $intergenic_file_name) || die ("Could not open file!");
+
+
+######################### Calculate frequency models ####################### 
+
 
 # calculate zygosity ratio frequency, print to file
 # foreach my $genotype (sort(keys %genotype_hash)) {
@@ -243,6 +259,17 @@ foreach $1 (sort(keys %exonic_consequence_hash)) {
       print $exonic_con_handle "$1\t$exonic_con_freq\n";
    }
 }
+
+# Calculating exonic, intronic, and intergenic frequencies, printing to files
+my $intronic_freq;
+my $exonic_freq;
+my $intergenic_freq;
+$intronic_freq = $intronic/$mutation_total;
+$exonic_freq = $exonic/$mutation_total;
+$intergenic_freq = $intergenic/$mutation_total;
+print $intronic_handle "$intronic_freq\n";
+print $exonic_handle "$exonic_freq\n";
+print $intergenic_handle "$intergenic_freq\n";
 
 print "Intronic -- $intronic\nExonic -- $exonic\nIntergenic -- $intergenic\n";
 #print "Total Annotations -- $annotation_total\n";
