@@ -5,12 +5,13 @@ use Math::Round;
 
 
 if ($#ARGV < 1) {
-   print "parameter mismatch\nTo run type this command:\nperl $0 fastahack reference input_pos_file output_file\n\n";
+   print "parameter mismatch\nTo run type this command:\nperl $0 fastahack reference input_pos_file output_file human_gff_file\n\n";
 
    print " first argument = full path to fastahack\n"; 
    print " second argument = full path to reference genome\n"; 
    print " third argument = input file with arbitrary number of columns, but 1st col=chromosome name and 2nd col=position\n"; 
-   print " fourth argument = output file with three columns: chromosome name, position of the center nucleotide, and the thre-nucleotide context for that position\n\n\n"; 
+   print " fourth argument = output file with three columns: chromosome name, position of the center nucleotide, and the thre-nucleotide context for that position\n";
+   print " fifth argument = full path to human gff file\n\n\n"; 
    exit 1;
 }
 
@@ -19,7 +20,7 @@ my $Fastahack=$ARGV[0];
 my $Reference=$ARGV[1];
 open(InputPositions,             '<', $ARGV[2]) || die("Could not open file!");
 open(OutputTrinucleotideContext, '>', $ARGV[3]) || die("Could not open file!");
-
+open(HumanGFF,                   '<', $ARGV[4]) || die("Could not open file!");
 
 
 
@@ -33,6 +34,9 @@ print OutputTrinucleotideContext "$head\tContext\n";
 # creating trinucleotide context data hash, insertion and deletion counts
 my %trinucleotide_context_data;
 my %context_tally_across_mutated_to;
+my %gff_hash;
+my $gffMatch;
+my %location;
 # my %genotype_hash;
 my %insertion_hash;
 my %deletion_hash;   
@@ -193,6 +197,21 @@ while (<InputPositions>) {
    elsif ( $annotation =~ /Func.refGene=.{0,15}downstream\;/ ) {
       $intergenic++;
    }
+   
+   $location{$coordinate}++;
+   # Reading input gff file, incrementing gff variant region hash
+   # while (<HumanGFF>) {
+      # $_ =~ s/\n|\r//;
+      # my @line = split('\t', $_);
+      # my $region_name = "$line[3]-$line[4]";
+      # if ($coordinate >= $line[3] && $coordinate <= $line[4]) {
+         # $gff_hash{$region_name}++;
+         # $gffMatch++;
+         # print "$coordinate $region_name\n";
+      # }
+   # }
+   #print "$region_name, $gff_hash{$region_name}\n";
+   
 
    # to keep track of progress
    # 1000000 for LARGE dbsnp vcfs, 10000 for smaller vcf/tsv tumor mutation files
@@ -206,6 +225,30 @@ while (<InputPositions>) {
 # print total number of mutations
 my $mutation_total = $line_count;
 print "Number of Mutations -- $mutation_total\n";
+
+# Reading input gff file, incrementing gff variant region hash
+while (<HumanGFF>) {
+   $_ =~ s/\n|\r//;
+   my @line = split('\t', $_);
+   my $region_name = "$line[3]-$line[4]";
+   my $region_length = $line[4] - $line[3];
+   my $region_freq;
+   foreach my $coordinate (sort(keys %location)) {
+      if ($coordinate >= $line[3] && $coordinate <= $line[4]) {
+         $gff_hash{$region_name}++;
+         $gffMatch++;
+         # print "$coordinate $region_name\n";
+      }
+   }
+   if ($gff_hash{$region_name} > 0) {
+      $region_freq = $gff_hash{$region_name} / $region_length;
+      print "Region $region_name variant frequency -- $region_freq\n";
+      print "Total variants in region $region_name -- $gff_hash{$region_name}\n";
+   }
+}
+   #print "$region_name, $gff_hash{$region_name}\n";
+
+print "GFF Match -- $gffMatch\n";
 
 
 ######################### open files for writing ##########################
