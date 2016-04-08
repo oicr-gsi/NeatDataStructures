@@ -238,7 +238,7 @@ while (<HumanGFF>) {
    my @line = split('\t', $_);
    my $region_name = "$line[3]-$line[4]";
    my $region_length = $line[4] - $line[3];
-   my $region_freq;
+   my $region_freq = 0;
    foreach my $coordinate (sort(keys %location)) {
       if ($coordinate >= $line[3] && $coordinate <= $line[4]) {
          $gff_hash{$region_name}++;
@@ -246,7 +246,10 @@ while (<HumanGFF>) {
          # print "$coordinate $region_name\n";
       }
    }
-   if ($gff_hash{$region_name} > 0 && $line[2] eq "exon") {
+   if ($gff_hash{$region_name} == 0) {
+      print $bed_handle "$line[3]\t$line[4]\t$region_freq\n";
+   }
+   if ($gff_hash{$region_name} > 0) {
       $region_freq = $gff_hash{$region_name} / $region_length;
       print $bed_handle "$line[3]\t$line[4]\t$region_freq\n";
       print "Region $region_name variant frequency -- $region_freq\n";
