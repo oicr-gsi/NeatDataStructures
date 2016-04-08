@@ -226,6 +226,12 @@ while (<InputPositions>) {
 my $mutation_total = $line_count;
 print "Number of Mutations -- $mutation_total\n";
 
+
+################### Reading the input gff and creating custom BED file ####################
+
+my $gffBED = "vars.bed";
+open(my $bed_handle, '>', $gffBED) || die("Could not open file!");
+
 # Reading input gff file, incrementing gff variant region hash
 while (<HumanGFF>) {
    $_ =~ s/\n|\r//;
@@ -240,8 +246,9 @@ while (<HumanGFF>) {
          # print "$coordinate $region_name\n";
       }
    }
-   if ($gff_hash{$region_name} > 0) {
+   if ($gff_hash{$region_name} > 0 && $line[2] eq "exon") {
       $region_freq = $gff_hash{$region_name} / $region_length;
+      print $bed_handle "$line[3]\t$line[4]\t$region_freq\n";
       print "Region $region_name variant frequency -- $region_freq\n";
       print "Total variants in region $region_name -- $gff_hash{$region_name}\n";
    }
