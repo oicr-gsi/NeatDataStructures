@@ -30,6 +30,8 @@ open(HumanGFF,                   '<', $ARGV[4]) || die("Could not open file!");
 my $head = <InputPositions>;
 $head =~ s/\n|\r//;
 print OutputTrinucleotideContext "$head\tContext\n";
+my $gffHead = <HumanGFF>;
+chomp $gffHead;
 
 # creating trinucleotide context data hash, insertion and deletion counts
 my %trinucleotide_context_data;
@@ -231,6 +233,9 @@ print "Number of Mutations -- $mutation_total\n";
 
 my $gffBED = "vars.bed";
 open(my $bed_handle, '>', $gffBED) || die("Could not open file!");
+
+# Print BED file Header
+print $bed_handle "START\tEND\tVariant_Frequency\n";
 
 # Reading input gff file, incrementing gff variant region hash
 while (<HumanGFF>) {
