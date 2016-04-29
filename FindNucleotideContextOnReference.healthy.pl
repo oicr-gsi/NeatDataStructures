@@ -235,28 +235,28 @@ my $gffBED = "vars.bed";
 open(my $bed_handle, '>', $gffBED) || die("Could not open file!");
 
 # Print BED file Header
-print $bed_handle "START\tEND\tVariant_Frequency\n";
+print $bed_handle "CHROMOSOME\tSTART\tEND\tVariant_Frequency\n";
 
 # Reading input gff file, incrementing gff variant region hash
 while (<HumanGFF>) {
    $_ =~ s/\n|\r//;
    my @line = split('\t', $_);
-   my $region_name = "$line[3]-$line[4]";
-   my $region_length = $line[4] - $line[3];
+   my $region_name = "$line[1]-$line[2]";
+   my $region_length = $line[2] - $line[1];
    my $region_freq = 0;
    foreach my $coordinate (sort(keys %location)) {
-      if ($coordinate >= $line[3] && $coordinate <= $line[4]) {
+      if ($coordinate >= $line[1] && $coordinate <= $line[2]) {
          $gff_hash{$region_name}++;
          $gffMatch++;
          # print "$coordinate $region_name\n";
       }
    }
    if ($gff_hash{$region_name} == 0) {
-      print $bed_handle "$line[3]\t$line[4]\t$region_freq\n";
+      print $bed_handle "$line[0]\t$line[1]\t$line[2]\t$region_freq\n";
    }
    if ($gff_hash{$region_name} > 0) {
       $region_freq = $gff_hash{$region_name} / $region_length;
-      print $bed_handle "$line[3]\t$line[4]\t$region_freq\n";
+      print $bed_handle "$line[0]\t$line[1]\t$line[2]\t$region_freq\n";
       print "Region $region_name variant frequency -- $region_freq\n";
       print "Total variants in region $region_name -- $gff_hash{$region_name}\n";
    }
